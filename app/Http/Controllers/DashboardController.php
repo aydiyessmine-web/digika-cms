@@ -2,32 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Media;
 use App\Models\Campaign;
+use App\Models\Media;
 use App\Models\AiRequest;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $mediaCount    = Media::count();
-        $campaignCount = Campaign::count();
-        $aiCount       = AiRequest::count();
-
-        // Screen count — utilisera le model Screen quand on le crée
-        $screenCount = 0;
-        if (class_exists(\App\Models\Screen::class)) {
-            $screenCount = \App\Models\Screen::count();
-        }
-
-        $recentMedia = Media::latest()->take(6)->get();
-
+        // Statistiques pour les cartes
+        $totalMedia = Media::count();
+        $totalCampaigns = Campaign::count();
+        $activeCampaigns = Campaign::where('status', 'active')->count();
+        $iaRequestsToday = AiRequest::whereDate('created_at', today())->count();
+        
+        // Calculer le nombre de nouvelles campagnes cette semaine
+        $newCampaignsThisWeek = Campaign::where('created_at', '>=', now()->startOfWeek())->count();
+        
+        // Médias récents
+        $recentMedia = Media::latest()->take(4)->get();
+        
+        // Campagnes actives
+        $activeCampaignsList = Campaign::where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+        
+        // Données par défaut pour screens (pour éviter les erreurs)
+        $totalScreens = 0;
+        $connectedScreens = 0;
+        $connectedScreensList = [];
+        
         return view('dashboard.index', compact(
-            'mediaCount',
-            'campaignCount',
-            'aiCount',
-            'screenCount',
-            'recentMedia'
+            'totalMedia',
+            'totalCampaigns', 
+            'activeCampaigns',
+            'totalScreens',
+            'connectedScreens',
+            'iaRequestsToday',
+            'newCampaignsThisWeek',
+            'recentMedia',
+            'activeCampaignsList',
+            'connectedScreensList'
         ));
     }
 }

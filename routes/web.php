@@ -32,8 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', [DashboardController::class, 'index']);
     
-    // Assistant IA (accessible par tous les rôles)
-    Route::get('/ai-assistant', [AiAssistantController::class, 'index'])->name('ai.index');
+    // Assistant IA (accessible par tous les rôles) - UNE SEULE FOIS !
+    Route::get('/ai-assistant', [AiAssistantController::class, 'index'])->name('ai.assistant');
     Route::post('/ai/generate', [AiAssistantController::class, 'generate'])->name('ai.generate');
     
     // Catégories (admin + marketing)
@@ -43,7 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('campaigns', CampaignController::class)->middleware('role:admin,marketing');
     
     // Médias (admin + marketing)
-    Route::resource('media', MediaController::class)->middleware('role:admin,marketing');
+    Route::resource('media', MediaController::class);
     
     // Écrans (admin + marketing)
     Route::resource('screens', ScreenController::class)->middleware('role:admin,marketing');

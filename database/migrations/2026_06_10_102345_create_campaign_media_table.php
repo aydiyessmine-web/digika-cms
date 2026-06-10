@@ -1,5 +1,4 @@
 <?php
-// database/migrations/2026_06_01_000005_create_campaign_media_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,10 +10,9 @@ return new class extends Migration
     {
         Schema::create('campaign_media', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('campaign_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('media_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('campaign_id')->constrained('campaigns')->cascadeOnDelete();
+            $table->foreignId('media_id')->constrained('media')->cascadeOnDelete();
             $table->integer('position')->default(0);
-            $table->integer('duration')->nullable();
             $table->timestamps();
         });
     }

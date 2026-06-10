@@ -6,374 +6,448 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>DigiCMS - Créer un compte</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Google Fonts: Poppins and Montserrat (identique à login) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
-}
-
-body{
-    background:linear-gradient(135deg,#2a2a2a 0%,#1a1a1a 100%);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-/* CONTAINER */
-.container{
-    width:1000px;
-    max-width:90%;
-    height:780px;
-    max-height:85vh;
-    display:flex;
-    overflow:hidden;
-    background:white;
-    border-radius:28px;
-    box-shadow:
-    0 25px 50px -12px rgba(0,0,0,.4),
-    0 0 0 1px rgba(255,255,255,.1);
-    transition:.3s;
-}
-
-.container:hover{
-    transform:translateY(-3px);
-    box-shadow:
-    0 30px 50px -15px rgba(0,0,0,.5);
-}
-
-/* LEFT SIDE */
-.left{
-    width:50%;
-    position:relative;
-    overflow:hidden;
-    background:#08070f;
-
-    background-image:
-    linear-gradient(rgba(228,29,29,.12) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(228,29,29,.12) 1px,transparent 1px);
-
-    background-size:25px 25px;
-}
-
-.left::before{
-    content:'';
-    position:absolute;
-    top:-50%;
-    left:-50%;
-    width:200%;
-    height:200%;
-
-    background:
-    radial-gradient(circle,
-    rgba(228,29,29,.06) 0%,
-    transparent 70%);
-
-    animation:rotate 20s linear infinite;
-}
-
-@keyframes rotate{
-    from{transform:rotate(0deg);}
-    to{transform:rotate(360deg);}
-}
-
-/* Logo image */
-.logo-image{
-    position:absolute;
-    top:30px;
-    left:35px;
-    z-index:2;
-}
-
-.logo-image img{
-    height:45px;
-    width:auto;
-}
-
-.hero{
-    position:absolute;
-    left:85px;
-    top:180px;
-    z-index:2;
-}
-
-.hero h1{
-    color:white;
-    font-size:36px;
-    font-weight:400;
-    line-height:1.15;
-    letter-spacing:-0.5px;
-}
-
-.hero h1 span{
-    font-style:italic;
-    font-weight:500;
-
-    background:
-    linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #e41d1d 100%);
-
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-}
-.hero h2{
-    color:#e41d1d;
-    font-size:32px;
-    font-weight:500;
-    margin-top:3px;
-}
-
-.hero p{
-    color:#a08282;
-    font-style:italic;
-    font-size:17px;
-    line-height:1.35;
-    margin-top:18px;
-    font-weight:300;
-}
-
-/* RIGHT */
-.right{
-    width:50%;
-    background:linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #f8f8f8 100%);
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    position:relative;
-    padding:0;
-}
-
-.form-box{
-    width:300px;
-    padding:15px;
-}
-
-.form-box h1{
-    font-size:18px;
-    color:#1d2433;
-    margin-bottom:22px;
-    font-weight:700;
-    position:relative;
-    text-align:left;
-}
-
-.form-box h1::after{
-    content:'';
-    position:absolute;
-    left:0;
-    bottom:-6px;
-    width:35px;
-    height:2.5px;
-    background:#e41d1d;
-    border-radius:2px;
-}
-
-label{
-    display:block;
-    margin-bottom:6px;
-    color:#4b5563;
-    font-size:13px;
-}
-
-input,
-select{
-    width:100%;
-    height:40px;
-    border:2px solid #e8eaf0;
-    border-radius:8px;
-    padding:0 12px;
-    margin-bottom:14px;
-    font-size:12px;
-    background:white;
-    transition:.3s;
-}
-
-input:focus,
-select:focus{
-    outline:none;
-    border-color:#e41d1d;
-    box-shadow:0 0 0 2px rgba(228,29,29,.1);
-}
-
-
-
-.password{
-    position:relative;
-}
-
-.password span{
-    position:absolute;
-    right:12px;
-    top:7px;
-    color:#9ca3af;
-    font-size:14px;
-    cursor:pointer;
-}
-
-.password span:hover{
-    color:#e21a1a;
-}
-
-button{
-    width:100%;
-    height:42px;
-    border:none;
-
-    background:
-    linear-gradient(
-    135deg,
-    #e41d1d 0%,
-    #b81515 100%);
-
-    color:white;
-    border-radius:8px;
-    font-weight:600;
-    cursor:pointer;
-    margin-top:8px;
-    font-size:13px;
-    transition:.3s;
-}
-
-button:hover{
-    transform:translateY(-1px);
-    box-shadow:
-    0 8px 20px -5px
-    rgba(228,29,29,.4);
-}
-
-.bottom{
-    text-align:center;
-    margin-top:14px;
-    color:#9da2af;
-    font-size:11px;
-}
-
-.bottom a{
-    color:#e41d1d;
-    font-weight:600;
-    text-decoration:none;
-}
-
-.bottom a:hover{
-    text-decoration:underline;
-}
-
-.error-message{
-    background:#fee2e2;
-    color:#dc2626;
-    padding:6px 10px;
-    border-radius:6px;
-    font-size:11px;
-    margin-bottom:12px;
-    text-align:center;
-}
-
-.success-message{
-    background:#dcfce7;
-    color:#166534;
-    padding:6px 10px;
-    border-radius:6px;
-    font-size:11px;
-    margin-bottom:12px;
-    text-align:center;
-}
-
-/* Scrollbar */
-.right::-webkit-scrollbar{
-    width:4px;
-}
-.right::-webkit-scrollbar-track{
-    background:#f1f1f1;
-}
-.right::-webkit-scrollbar-thumb{
-    background:#e21a1a;
-    border-radius:4px;
-}
-
-@media (max-width:800px){
-    .container{
-        flex-direction:column;
-        width:450px;
-        height:auto;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    .left,.right{
-        width:100%;
+
+    body {
+        background: linear-gradient(135deg, #2e1a1f 0%, #3e161a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        font-family: 'Poppins', sans-serif;
     }
-    .hero{
-        position:relative;
-        left:0;
-        top:0;
-        padding:40px;
+
+    /* Container - MÊME TAILLE QUE LOGIN */
+    .register-container {
+        display: flex;
+        width: 1000px;
+        max-width: 90%;
+        height: 980px;
+        max-height: 95vh;
+        background: #ffffff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 45px 70px -32px rgba(0, 0, 0, 0.4);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .logo-image{
-        position:relative;
-        top:0;
-        left:0;
-        padding:30px 30px 0 30px;
+
+    .register-container:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.5);
     }
-    .hero h1{
-        font-size:28px;
+
+    /* Left Section - MÊME STYLE QUE LOGIN */
+    .left-panel {
+        position: relative;
+        flex: 0 0 50%;
+        background-color: #0b0b0d;
+        overflow: hidden;
     }
-    .hero h2{
-        font-size:22px;
+
+    /* Red Grid Overlay */
+    .grid-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            linear-gradient(to right, rgba(179, 24, 24, 0.12) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(179, 24, 24, 0.12) 1px, transparent 1px);
+        background-size: 18px 18px;
+        pointer-events: none;
+        z-index: 1;
     }
-    .hero p{
-        font-size:18px;
+
+    /* Left Content Container */
+    .left-content {
+        position: relative;
+        height: 100%;
+        padding: 40px 8% 60px 8%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 2;
     }
-    .form-box{
-        padding:30px;
+
+    /* Logo Image */
+    .logo-image {
+        position: relative;
+        top: 20;
+        left: 20;
+        z-index: 2;
+        margin-bottom: 20px;
     }
-}
+
+    .logo-image img {
+        height: 72px;
+        width: auto;
+    }
+
+    /* Left Typography Block */
+    .typography-block {
+        margin-bottom: 5%;
+    }
+
+    .main-heading {
+        font-size: 38px;
+        font-weight: 300;
+        line-height: 1.2;
+        margin-bottom: 25px;
+    }
+
+    .main-heading span {
+        display: block;
+    }
+
+    .main-heading .italic-text {
+        font-style: italic;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+    }
+
+    .main-heading .normal-text {
+        font-style: normal;
+        font-weight: 200;
+        color: #939598;
+        letter-spacing: -0.5px;
+    }
+
+    .sub-heading {
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 1.35;
+        font-style: italic;
+        color: #832a2a;
+        letter-spacing: -0.2px;
+    }
+
+    .sub-heading span {
+        display: block;
+    }
+
+    /* Middle Divider Stripe - MÊME QUE LOGIN */
+    .divider-stripe {
+        flex: 0 0 5%;
+        height: 100%;
+        background: linear-gradient(to right, #b0b4ba 0%, #dbdee3 100%);
+        box-shadow: inset 10px 0 15px -10px rgba(0, 0, 0, 0.45);
+        position: relative;
+        z-index: 3;
+    }
+
+    /* Right Section: Form Panel */
+    .right-panel {
+        flex: 0 0 45%;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 5%;
+        overflow-y: auto;
+        z-index: 2;
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 350px;
+        padding: 15px 0;
+    }
+
+    .form-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0d121c;
+        margin-bottom: 22px;
+        letter-spacing: -0.3px;
+        position: relative;
+    }
+
+    .form-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -6px;
+        width: 35px;
+        height: 2.5px;
+        background: #c91818;
+        border-radius: 2px;
+    }
+
+    /* Form Groups */
+    .register-form {
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 12px;
+        color: #4b5563;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .form-group input, 
+    .form-group select {
+        width: 100%;
+        height: 42px;
+        padding: 0 14px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #1f2937;
+        font-family: 'Poppins', sans-serif;
+        background-color: #ffffff;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: #c91818;
+        box-shadow: 0 0 0 3px rgba(201, 24, 24, 0.1);
+    }
+
+    .form-group input::placeholder {
+        color: #9ca3af;
+    }
+
+    /* Password wrapper */
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .password-wrapper input {
+        padding-right: 42px;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .toggle-password:hover {
+        color: #c91818;
+    }
+
+    /* Custom Dropdown Role Styling */
+    .select-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .select-wrapper select {
+        padding-left: 38px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+    }
+
+    .select-arrow-left {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 9px;
+        color: #000000;
+        pointer-events: none;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        height: 44px;
+        background-color: #c91818;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 12px;
+        margin-bottom: 18px;
+        transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .submit-btn:hover {
+        background-color: #b01414;
+    }
+
+    .submit-btn:active {
+        transform: scale(0.985);
+    }
+
+    /* Form Footer */
+    .form-footer {
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .footer-text {
+        color: #9ca3af;
+    }
+
+    .footer-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        margin-left: 2px;
+    }
+
+    .footer-link:hover {
+        text-decoration: underline;
+        color: #1d4ed8;
+    }
+
+    .error-message {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .success-message {
+        background: #dcfce7;
+        color: #166534;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    /* Scrollbar */
+    .right-panel::-webkit-scrollbar {
+        width: 4px;
+    }
+    .right-panel::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    .right-panel::-webkit-scrollbar-thumb {
+        background: #c91818;
+        border-radius: 4px;
+    }
+
+    /* Responsive - MÊME QUE LOGIN */
+    @media (max-width: 800px) {
+        .register-container {
+            flex-direction: column;
+            height: auto;
+            width: 450px;
+        }
+        .left-panel, .right-panel {
+            flex: 0 0 auto;
+            width: 100%;
+        }
+        .left-panel {
+            min-height: 320px;
+        }
+        .divider-stripe {
+            flex: 0 0 10px;
+            height: 10px;
+            width: 100%;
+            background: linear-gradient(to bottom, #b0b4ba 0%, #dbdee3 100%);
+        }
+        .left-content {
+            padding: 30px;
+        }
+        .typography-block {
+            margin-bottom: 0;
+        }
+        .main-heading {
+            font-size: 28px;
+        }
+        .sub-heading {
+            font-size: 15px;
+        }
+        .right-panel {
+            padding: 40px 20px;
+        }
+        .logo-image {
+            margin-bottom: 10px;
+        }
+        .logo-image img {
+            height: 35px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-heading {
+            font-size: 24px;
+        }
+        .form-title {
+            font-size: 18px;
+        }
+        .logo-image img {
+            height: 30px;
+        }
+    }
 </style>
 </head>
 <body>
 
-<div class="container">
-
-    <div class="left">
-
-        <!-- Logo image ajouté ici -->
-        <div class="logo-image">
-            <img src="{{ asset('images/logo.png') }}" alt="Digika CMS Logo" onerror="this.src='https://placehold.co/150x45/ffffff/e41d1d?text=DigikaCMS'">
+<div class="register-container">
+    <!-- Left Section - IDENTIQUE LOGIN -->
+    <div class="left-panel">
+        <div class="grid-overlay"></div>
+        <div class="left-content">
+            <!-- Logo Image (remplace le texte) -->
+            <div class="logo-image">
+                <img src="{{ asset('images/logo.png') }}" alt="Digika CMS Logo" onerror="this.src='https://placehold.co/150x42/ffffff/c91818?text=DigikaCMS'">
+            </div>
+            <div class="typography-block">
+                <h1 class="main-heading">
+                    <span class="italic-text">Gérez votre</span>
+                    <span class="italic-text">affichage</span>
+                    <span class="normal-text">dynamique.</span>
+                </h1>
+                <p class="sub-heading">
+                    <span>Plateforme intelligente</span>
+                    <span>pour vos écrans</span>
+                    <span>professionnels</span>
+                </p>
+            </div>
         </div>
-
-        <div class="hero">
-
-            <h1>
-                Gérez votre<br>
-                <span>affichage</span>
-            </h1>
-
-            <h2>dynamique.</h2>
-
-            <p>
-                Plateforme intelligente<br>
-                pour vos écrans<br>
-                professionnels
-            </p>
-
-        </div>
-
     </div>
 
-    <div class="right">
+    <!-- Middle Divider Stripe -->
+    <div class="divider-stripe"></div>
 
-        <div class="form-box">
-
-            <h1>Créer un compte</h1>
+    <!-- Right Section: Register Form -->
+    <div class="right-panel">
+        <div class="form-container">
+            <h2 class="form-title">Créer un compte</h2>
 
             @if($errors->any())
                 <div class="error-message">
@@ -391,62 +465,100 @@ button:hover{
                 <div class="error-message">{{ session('error') }}</div>
             @endif
 
-            <form action="{{ route('register') }}" method="POST">
+            <form class="register-form" action="{{ route('register') }}" method="POST">
                 @csrf
 
-                <label>Nom Complet</label>
-                <input type="text" name="name" value="{{ old('name') }}" placeholder="prenom nom" required>
-
-                <label>Adresse Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="balamia@gmail.com" required>
-
-                <label>Rôle</label>
-                <select name="role" required>
-                    <option value="">Sélectionnez votre rôle</option>
-                    <option value="marketing" {{ old('role') == 'marketing' ? 'selected' : '' }}>Marketing</option>
-                    <option value="viewer" {{ old('role') == 'viewer' ? 'selected' : '' }}>Visualisateur</option>
-                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrateur</option>
-                </select>
-
-                <label>Mot De Passe</label>
-                <div class="password">
-                    <input type="password" name="password" id="password" placeholder="Entrer votre mot de passe" required>
-                    <span onclick="togglePassword('password')">👁</span>
+                <!-- Nom Complet -->
+                <div class="form-group">
+                    <label for="name">Nom Complet</label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="prenom nom" required>
                 </div>
 
-                <label>Confirmer Mot De Passe</label>
-                <div class="password">
-                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirmer votre mot de passe" required>
-                    <span onclick="togglePassword('password_confirmation')">👁</span>
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Adresse Email</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="balamia@gmail.com" required>
                 </div>
 
-                <button type="submit">Créer un compte</button>
-
-                <div class="bottom">
-                    Déjà Un Compte ?
-                    <a href="{{ route('login') }}">Se Connecter</a>
+                <!-- Rôle -->
+                <div class="form-group">
+                    <label for="role">Rôle</label>
+                    <div class="select-wrapper">
+                        <span class="select-arrow-left">▼</span>
+                        <select id="role" name="role" required>
+                            <option value="">Sélectionnez votre rôle</option>
+                            <option value="marketing" {{ old('role') == 'marketing' ? 'selected' : '' }}>Marketing</option>
+                            <option value="viewer" {{ old('role') == 'viewer' ? 'selected' : '' }}>Visualisateur</option>
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrateur</option>
+                        </select>
+                    </div>
                 </div>
 
+                <!-- Mot de Passe -->
+                <div class="form-group">
+                    <label for="password">Mot De Passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Entrer votre mot de passe" required>
+                        <button type="button" class="toggle-password" data-target="password">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirmer Mot de Passe -->
+                <div class="form-group">
+                    <label for="password_confirmation">Confirmer Mot De Passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirmer votre mot de passe" required>
+                        <button type="button" class="toggle-password" data-target="password_confirmation">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Créer un compte</button>
+
+                <div class="form-footer">
+                    <span class="footer-text">Déjà Un Compte ?</span>
+                    <a href="{{ route('login') }}" class="footer-link">Se Connecter</a>
+                </div>
             </form>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
-    function togglePassword(fieldId) {
-        const input = document.getElementById(fieldId);
-        const icon = event.target;
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.textContent = '🙈';
-        } else {
-            input.type = 'password';
-            icon.textContent = '👁';
-        }
-    }
+    // Toggle password visibility for all password fields
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                `;
+            } else {
+                input.type = 'password';
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                `;
+            }
+        });
+    });
 </script>
 
 </body>

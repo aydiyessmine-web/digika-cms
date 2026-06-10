@@ -1,5 +1,4 @@
 <?php
-// database/migrations/2026_06_01_000004_create_campaigns_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,7 +18,7 @@ return new class extends Migration
             $table->integer('progress')->default(0);
             $table->integer('media_count')->default(0);
             $table->integer('screens_count')->default(0);
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -1,5 +1,4 @@
 <?php
-// database/migrations/2026_06_01_000003_create_media_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,14 +11,14 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('type', ['image', 'video', 'document']);
+            $table->enum('type', ['image', 'video', 'pdf', 'document'])->default('image');
             $table->string('file_path');
             $table->string('thumbnail_path')->nullable();
-            $table->integer('size')->nullable()->comment('Taille en KB');
-            $table->integer('duration')->nullable()->comment('Durée vidéo en secondes');
+            $table->bigInteger('size')->nullable();
+            $table->string('duration')->nullable();
             $table->string('resolution', 50)->nullable();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->timestamps();
         });
     }
