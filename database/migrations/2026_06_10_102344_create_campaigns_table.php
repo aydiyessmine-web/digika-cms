@@ -14,12 +14,11 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->enum('status', ['draft', 'active', 'paused', 'completed', 'archived'])->default('draft');
+            $table->enum('status', ['active', 'planned', 'finished'])->default('planned');
             $table->integer('progress')->default(0);
             $table->integer('media_count')->default(0);
-            $table->integer('screens_count')->default(0);
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
+            $table->string('background_image')->nullable();
         });
     }
 

@@ -8,13 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('campaign_media', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('campaign_id')->constrained('campaigns')->cascadeOnDelete();
-            $table->foreignId('media_id')->constrained('media')->cascadeOnDelete();
-            $table->integer('position')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('campaign_media')) {
+            Schema::create('campaign_media', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('campaign_id')->constrained('campaigns')->cascadeOnDelete();
+                $table->foreignId('media_id')->constrained('media')->cascadeOnDelete();
+                $table->integer('position')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

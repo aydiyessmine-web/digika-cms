@@ -20,13 +20,13 @@ class DashboardController extends Controller
         // Calculer le nombre de nouvelles campagnes cette semaine
         $newCampaignsThisWeek = Campaign::where('created_at', '>=', now()->startOfWeek())->count();
         
-        // Médias récents
-        $recentMedia = Media::latest()->take(4)->get();
+        // Médias récents - 5 médias
+        $recentMedia = Media::latest()->take(5)->get();
         
-        // Campagnes actives
+        // Campagnes actives - 5 campagnes (au lieu de 3)
         $activeCampaignsList = Campaign::where('status', 'active')
             ->orderBy('created_at', 'desc')
-            ->take(3)
+            ->take(5)
             ->get();
         
         // Données par défaut pour screens (pour éviter les erreurs)
