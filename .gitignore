@@ -31,3 +31,4 @@ storage/
 .vscode/ 
 *.log 
 .DS_Store 
+".env" 

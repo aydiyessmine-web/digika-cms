@@ -11,8 +11,9 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('type', ['image', 'video', 'pdf', 'document'])->default('image');
-            $table->string('file_path');
+            $table->enum('type', ['image', 'video', 'pdf', 'document', 'webpage'])->default('image');
+            $table->string('file_path')->nullable(); // يصبح nullable لأن webpage ما عندها ملف
+            $table->string('url')->nullable(); // العمود الجديد للروابط
             $table->string('thumbnail_path')->nullable();
             $table->bigInteger('size')->nullable();
             $table->string('duration')->nullable();

@@ -1,8 +1,15 @@
-// Preview Media
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast-notification ${type}`;
+  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
 function previewMedia(url, type) {
   const previewDiv = document.getElementById('previewContent');
   if (type === 'image') {
-    previewDiv.innerHTML = `<img src="${url}" alt="Aperçu" style="max-width:100%; max-height:70vh; border-radius:8px;">`;
+    previewDiv.innerHTML = `<img src="${url}" alt="Aperçu">`;
   } else if (type === 'video') {
     previewDiv.innerHTML = `<video controls src="${url}" style="max-width:100%; max-height:70vh;"></video>`;
   } else if (type === 'pdf') {
@@ -17,31 +24,15 @@ function closePreviewModal() {
   document.getElementById('previewModal').style.display = 'none';
 }
 
-// Hover pour le bouton zoom
-document.querySelectorAll('.media-card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    const btn = card.querySelector('.media-zoom-btn');
-    if (btn) btn.style.opacity = '1';
-  });
-  card.addEventListener('mouseleave', () => {
-    const btn = card.querySelector('.media-zoom-btn');
-    if (btn) btn.style.opacity = '0';
-  });
-});
-
-// Double-clic sur média -> redirection vers médiathèque
+// Double-clic sur média
 document.querySelectorAll('.media-card').forEach(card => {
   card.addEventListener('dblclick', function(e) {
     const mediaId = this.getAttribute('data-media-id');
-    if (mediaId) {
-      window.location.href = "/media?highlight=" + mediaId;
-    } else {
-      window.location.href = "/media";
-    }
+    window.location.href = mediaId ? "/media?highlight=" + mediaId : "/media";
   });
 });
 
-// Double-clic sur campagne -> redirection vers campagnes
+// Double-clic sur campagne
 document.querySelectorAll('.campaign-item').forEach(item => {
   item.addEventListener('dblclick', function(e) {
     window.location.href = "/campaigns";
@@ -51,16 +42,17 @@ document.querySelectorAll('.campaign-item').forEach(item => {
 // Recherche globale
 const searchInput = document.getElementById('globalSearch');
 if (searchInput) {
-  const mediaCards = document.querySelectorAll('.media-card');
-  const campaignItems = document.querySelectorAll('.campaign-item');
+  const mediaCards = document.querySelectorAll('#mediaGrid .media-card');
+  const campaignItems = document.querySelectorAll('#campaignList .campaign-item');
+
   function applySearchHighlight() {
     const searchTerm = searchInput.value.trim().toLowerCase();
     mediaCards.forEach(card => {
-      const title = card.querySelector('.media-title')?.textContent || '';
+      const searchData = card.getAttribute('data-search') || '';
       if (searchTerm === '') {
         card.style.opacity = '1';
         card.classList.remove('highlight');
-      } else if (title.toLowerCase().includes(searchTerm)) {
+      } else if (searchData.includes(searchTerm)) {
         card.style.opacity = '1';
         card.classList.add('highlight');
       } else {
@@ -69,11 +61,11 @@ if (searchInput) {
       }
     });
     campaignItems.forEach(item => {
-      const title = item.querySelector('.campaign-name')?.textContent || '';
+      const searchData = item.getAttribute('data-search') || '';
       if (searchTerm === '') {
         item.style.opacity = '1';
         item.classList.remove('highlight');
-      } else if (title.toLowerCase().includes(searchTerm)) {
+      } else if (searchData.includes(searchTerm)) {
         item.style.opacity = '1';
         item.classList.add('highlight');
       } else {
@@ -84,6 +76,51 @@ if (searchInput) {
   }
   searchInput.addEventListener('input', applySearchHighlight);
 }
+
+// Settings dropdown
+const dropdownBtn = document.getElementById('settingsDropdownBtn');
+const dropdown = document.getElementById('settingsDropdown');
+if (dropdownBtn) {
+  dropdownBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+  document.addEventListener('click', () => dropdown?.classList.remove('show'));
+}
+
+// Zoom
+let zoom = 100;
+const zoomSpan = document.getElementById('zoomValue');
+const mainDiv = document.getElementById('mainContent');
+const zoomIn = document.getElementById('zoomIn');
+const zoomOut = document.getElementById('zoomOut');
+if (zoomIn) zoomIn.addEventListener('click', () => { if(zoom < 150) { zoom += 10; zoomSpan.innerText = zoom+'%'; mainDiv.style.zoom = zoom/100; } });
+if (zoomOut) zoomOut.addEventListener('click', () => { if(zoom > 70) { zoom -= 10; zoomSpan.innerText = zoom+'%'; mainDiv.style.zoom = zoom/100; } });
+
+// Theme
+document.querySelectorAll('[data-theme]').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const theme = opt.dataset.theme;
+    if(theme === 'dark') { 
+      mainDiv.style.backgroundColor = '#1e293b'; 
+      mainDiv.style.color = '#e2e8f0'; 
+      document.querySelectorAll('.stat-card, .campaigns-widget, .media-widget, .media-card, .modal-content').forEach(el => { if(el) el.style.backgroundColor = '#2d3a4e'; }); 
+      document.querySelectorAll('.media-card, .campaigns-widget, .media-widget, .stat-card').forEach(el => { if(el) el.style.borderColor = '#4a5568'; }); 
+    } else { 
+      mainDiv.style.backgroundColor = '#fff'; 
+      mainDiv.style.color = '#000'; 
+      document.querySelectorAll('.stat-card, .campaigns-widget, .media-widget, .media-card, .modal-content').forEach(el => { if(el) el.style.backgroundColor = 'white'; }); 
+      document.querySelectorAll('.media-card, .campaigns-widget, .media-widget, .stat-card').forEach(el => { if(el) el.style.borderColor = '#eef2f6'; }); 
+    }
+    dropdown.classList.remove('show');
+  });
+});
+
+// AI pills
+document.querySelectorAll('.ai-pill').forEach(pill => {
+  pill.addEventListener('click', () => { 
+    const text = pill.textContent.replace(/[✦⭐]/g, '').trim();
+    const input = document.getElementById('aiPrompt');
+    if (input) input.value = text; 
+  });
+});
 
 // Fermer modal avec Echap
 document.addEventListener('keydown', (e) => {

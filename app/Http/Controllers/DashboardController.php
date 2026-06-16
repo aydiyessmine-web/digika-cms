@@ -2,49 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Campaign;
 use App\Models\Media;
-use App\Models\AiRequest;
+use App\Models\Campaign;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Statistiques pour les cartes
+        // Données pour les statistiques
         $totalMedia = Media::count();
-        $totalCampaigns = Campaign::count();
-        $activeCampaigns = Campaign::where('status', 'active')->count();
-        $iaRequestsToday = AiRequest::whereDate('created_at', today())->count();
+        $imagesCount = Media::where('type', 'image')->count();
+        $videosCount = Media::where('type', 'video')->count();
+        $pdfCount = Media::where('type', 'pdf')->count();
+        $documentsCount = Media::whereIn('type', ['document', 'doc', 'docx', 'txt'])->count();
+        $totalSize = Media::sum('size');
+        $totalSizeMB = round($totalSize / 1024 / 1024, 1);
         
-        // Calculer le nombre de nouvelles campagnes cette semaine
-        $newCampaignsThisWeek = Campaign::where('created_at', '>=', now()->startOfWeek())->count();
+        // Derniers médias (pour le widget)
+        $recentMedia = Media::orderBy('created_at', 'desc')->limit(10)->get();
         
-        // Médias récents - 5 médias
-        $recentMedia = Media::latest()->take(5)->get();
-        
-        // Campagnes actives - 5 campagnes (au lieu de 3)
-        $activeCampaignsList = Campaign::where('status', 'active')
+        // Campagnes actives (pour le widget)
+        $activeCampaignsList = Campaign::with('media')
+            ->where('status', 'active')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->limit(5)
             ->get();
         
-        // Données par défaut pour screens (pour éviter les erreurs)
-        $totalScreens = 0;
-        $connectedScreens = 0;
-        $connectedScreensList = [];
+        $activeCampaigns = $activeCampaignsList->count();
+        $totalCampaigns = Campaign::count();
+        
+        // Données simulées pour les tendances (à remplacer par de vraies données)
+        $newMediaThisMonth = Media::whereMonth('created_at', now()->month)->count();
+        $mediaGrowth = 8.4;
+        $newCampaignsThisWeek = Campaign::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
+        $iaRequestsToday = rand(5, 25);
+        $iaGrowth = rand(-10, 15);
         
         return view('dashboard.index', compact(
-            'totalMedia',
-            'totalCampaigns', 
-            'activeCampaigns',
-            'totalScreens',
-            'connectedScreens',
-            'iaRequestsToday',
-            'newCampaignsThisWeek',
-            'recentMedia',
-            'activeCampaignsList',
-            'connectedScreensList'
+            'totalMedia', 'imagesCount', 'videosCount', 'pdfCount', 'documentsCount', 'totalSizeMB',
+            'recentMedia', 'activeCampaignsList', 'activeCampaigns', 'totalCampaigns',
+            'newMediaThisMonth', 'mediaGrowth', 'newCampaignsThisWeek', 'iaRequestsToday', 'iaGrowth'
         ));
     }
 }

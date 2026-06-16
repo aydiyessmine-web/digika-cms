@@ -13,27 +13,22 @@ class MediaController extends Controller
 {
     public function index(Request $request)
     {
-        // جلب كل الوسائط (بدون pagination من السيرفر)
         $query = Media::with('category');
         
-        // Filtre par catégorie
         if ($request->filled('category') && $request->category != 'all') {
             $query->whereHas('category', function($q) use ($request) {
                 $q->where('name', $request->category);
             });
         }
         
-        // Filtre par type
         if ($request->filled('type') && $request->type != 'all') {
             $query->where('type', $request->type);
         }
         
-        // Recherche par titre
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
         
-        // Tri
         $sort = $request->get('sort', 'recent');
         if ($sort == 'recent') {
             $query->orderBy('created_at', 'desc');
@@ -43,10 +38,8 @@ class MediaController extends Controller
             $query->orderBy('title', 'asc');
         }
         
-        // جلب جميع الوسائط (لـ client-side pagination)
         $allMedia = $query->get();
         
-        // إعداد بيانات الوسائط مع معلومات الفئة
         $mediaData = [];
         foreach ($allMedia as $item) {
             $mediaData[] = [
@@ -54,6 +47,7 @@ class MediaController extends Controller
                 'title' => $item->title,
                 'type' => $item->type,
                 'file_path' => $item->file_path,
+                'url' => $item->url,
                 'size' => $item->size,
                 'resolution' => $item->resolution,
                 'duration' => $item->duration,
@@ -65,90 +59,82 @@ class MediaController extends Controller
         
         $categories = Category::all();
         
-        // Statistiques (تظل كما هي)
         $totalMedia = Media::count();
         $imagesCount = Media::where('type', 'image')->count();
         $videosCount = Media::where('type', 'video')->count();
         $pdfCount = Media::where('type', 'pdf')->count();
         $documentsCount = Media::where('type', 'document')->count();
+        $webpagesCount = Media::where('type', 'webpage')->count();
         $totalSize = round(Media::sum('size') / 1024 / 1024, 1);
         
         return view('media.index', compact(
             'mediaData', 'categories', 'totalMedia', 'imagesCount', 
-            'videosCount', 'pdfCount', 'documentsCount', 'totalSize'
+            'videosCount', 'pdfCount', 'documentsCount', 'webpagesCount', 'totalSize'
         ));
     }
     
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|max:102400',
             'title' => 'required|string|max:255',
-            'type' => 'required|string',
-            'resolution' => 'nullable|string',
+            'type' => 'required|string|in:image,video,pdf,document,webpage',
             'category_id' => 'nullable|exists:categories,id',
-            'duration' => 'nullable|string',
+            'url' => 'nullable|url|max:2048',
+            'file' => 'nullable|file|max:102400',
         ]);
         
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation échouée', 'errors' => $validator->errors()], 422);
         }
         
-        $file = $request->file('file');
+        $data = [
+            'title' => $request->title,
+            'type' => $request->type,
+            'category_id' => $request->category_id,
+            'user_id' => Auth::id(),
+        ];
         
-        if (!$file || !$file->isValid()) {
-            return response()->json(['message' => 'Le fichier est invalide'], 422);
+        // إذا كان نوع webpage، نستعمل الـ URL
+        if ($request->type === 'webpage') {
+            if (!$request->url) {
+                return response()->json(['message' => 'Le champ URL est requis pour une page web'], 422);
+            }
+            $data['url'] = $request->url;
+            $data['file_path'] = null;
+            $data['size'] = 0;
+            $data['duration'] = null;
+            $data['resolution'] = null;
+        } else {
+            // للأنواع الأخرى، نستعمل الـ file
+            if (!$request->hasFile('file')) {
+                return response()->json(['message' => 'Un fichier est requis'], 422);
+            }
+            
+            $file = $request->file('file');
+            if (!$file->isValid()) {
+                return response()->json(['message' => 'Le fichier est invalide'], 422);
+            }
+            
+            $originalExtension = $file->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+            $path = $file->storeAs('media', $filename, 'public');
+            
+            $data['file_path'] = $path;
+            $data['size'] = $file->getSize();
+            $data['duration'] = $request->duration;
+            $data['resolution'] = $request->resolution;
+            $data['url'] = null;
         }
         
-        $originalExtension = $file->getClientOriginalExtension();
-        $fileSize = $file->getSize();
-        
-        // Détection du type réel
-        $detectedType = $this->detectFileType($originalExtension);
-        
-        // Générer nom unique
-        $filename = time() . '_' . uniqid() . '.' . $originalExtension;
-        $path = $file->storeAs('media', $filename, 'public');
-        
-        $duration = $request->duration;
-        
-        $media = Media::create([
-            'title' => $request->title,
-            'type' => $detectedType,
-            'file_path' => $path,
-            'size' => $fileSize,
-            'resolution' => $request->resolution,
-            'category_id' => $request->category_id,
-            'duration' => $duration,
-            'user_id' => Auth::id(),
-        ]);
+        $media = Media::create($data);
         
         return response()->json(['success' => true, 'media' => $media], 201);
-    }
-    
-    private function detectFileType($extension)
-    {
-        $extension = strtolower($extension);
-        
-        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'])) {
-            return 'image';
-        }
-        if (in_array($extension, ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'])) {
-            return 'video';
-        }
-        if ($extension === 'pdf') {
-            return 'pdf';
-        }
-        if (in_array($extension, ['doc', 'docx', 'txt', 'xls', 'xlsx', 'ppt', 'pptx'])) {
-            return 'document';
-        }
-        return 'document';
     }
     
     public function destroy($id)
     {
         $media = Media::findOrFail($id);
-        if (Storage::disk('public')->exists($media->file_path)) {
+        if ($media->file_path && Storage::disk('public')->exists($media->file_path)) {
             Storage::disk('public')->delete($media->file_path);
         }
         $media->delete();
@@ -161,6 +147,7 @@ class MediaController extends Controller
             'title' => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'resolution' => 'nullable|string',
+            'url' => 'nullable|url|max:2048',
         ]);
         
         if ($validator->fails()) {
@@ -168,7 +155,7 @@ class MediaController extends Controller
         }
         
         $media = Media::findOrFail($id);
-        $media->update($request->only(['title', 'category_id', 'resolution']));
+        $media->update($request->only(['title', 'category_id', 'resolution', 'url']));
         
         return response()->json(['success' => true]);
     }
@@ -178,9 +165,27 @@ class MediaController extends Controller
         $media = Media::with('category')->findOrFail($id);
         return response()->json($media);
     }
+    
     public function getContent($id)
     {
         $media = Media::findOrFail($id);
+        
+        if ($media->type === 'webpage' && $media->url) {
+            return response()->json([
+                'content' => $media->url,
+                'type' => 'webpage',
+                'filename' => $media->title,
+                'is_webpage' => true,
+                'url' => $media->url
+            ]);
+        }
+        
+        if (!$media->file_path) {
+            return response()->json([
+                'content' => 'Aucun fichier associé à ce média.',
+                'error' => true
+            ]);
+        }
         
         $fullPath = Storage::disk('public')->path($media->file_path);
         
@@ -194,9 +199,7 @@ class MediaController extends Controller
         $extension = strtolower(pathinfo($media->file_path, PATHINFO_EXTENSION));
         $content = '';
         
-        // ========== PDF ==========
         if ($extension === 'pdf') {
-            // Tentative d'extraction avec pdftotext (si installé sur le serveur)
             $txtFile = tempnam(sys_get_temp_dir(), 'pdf_') . '.txt';
             $command = 'pdftotext -layout "' . $fullPath . '" "' . $txtFile . '" 2>&1';
             exec($command, $output, $returnCode);
@@ -205,7 +208,6 @@ class MediaController extends Controller
                 $content = file_get_contents($txtFile);
                 unlink($txtFile);
             } else {
-                // Fallback: lire le PDF avec une bibliothèque PHP
                 if (class_exists('\Spatie\PdfToText\Pdf')) {
                     try {
                         $content = \Spatie\PdfToText\Pdf::getText($fullPath);
@@ -216,16 +218,12 @@ class MediaController extends Controller
                     $content = "Aperçu texte non disponible. Veuillez télécharger le fichier.";
                 }
             }
-        }
-        // ========== TXT ==========
-        elseif ($extension === 'txt') {
+        } elseif ($extension === 'txt') {
             $content = file_get_contents($fullPath);
             if (empty($content)) {
                 $content = "Fichier texte vide.";
             }
-        }
-        // ========== DOCX ==========
-        elseif ($extension === 'docx') {
+        } elseif ($extension === 'docx') {
             if (class_exists('\PhpOffice\PhpWord\IOFactory')) {
                 try {
                     $phpWord = \PhpOffice\PhpWord\IOFactory::load($fullPath);
@@ -246,8 +244,7 @@ class MediaController extends Controller
             } else {
                 $content = "Aperçu non disponible. Installez phpoffice/phpword pour extraire le texte.";
             }
-        }
-        else {
+        } else {
             $content = "Aperçu non disponible pour ce type de fichier (.$extension).";
         }
         
@@ -255,26 +252,8 @@ class MediaController extends Controller
             'content' => $content,
             'type' => $extension,
             'filename' => $media->title,
-            'size' => round($media->size / 1024, 2)
+            'size' => round($media->size / 1024, 2),
+            'is_webpage' => false
         ]);
-    }
-    /**
-     * Get file type based on extension
-     */
-    private function getFileType($extension)
-    {
-        $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
-        $videoTypes = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'];
-        $documentTypes = ['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx', 'ppt', 'pptx'];
-        
-        if (in_array($extension, $imageTypes)) {
-            return 'image';
-        } elseif (in_array($extension, $videoTypes)) {
-            return 'video';
-        } elseif (in_array($extension, $documentTypes)) {
-            return 'document';
-        } else {
-            return 'other';
-        }
     }
 }
