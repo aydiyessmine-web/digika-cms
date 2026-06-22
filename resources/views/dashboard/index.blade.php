@@ -46,28 +46,32 @@
   </div>
 
   <!-- Médiathèque récente -->
-  <div class="media-widget">
-    <div class="section-header"><h2 class="section-title">Médiathèque récente</h2><a href="{{ route('media.index') }}" class="section-link">Voir tout <i class="fas fa-arrow-right"></i></a></div>
-    <div class="media-grid" id="mediaGrid">
-      @forelse(($recentMedia ?? []) as $media)
-      <div class="media-card" data-media-id="{{ $media->id }}" data-media-type="{{ $media->type }}" data-media-url="{{ asset('storage/' . $media->file_path) }}" data-media-title="{{ $media->title }}" data-search="{{ strtolower($media->title) }} {{ strtolower($media->type) }}">
-        <div class="media-thumb" style="background-image: url('{{ $media->type === 'image' ? asset('storage/' . $media->file_path) : '' }}'); background-size: cover;">
-          @if($media->type !== 'image')
-          <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f3f4f6;"><i class="fas {{ $media->type === 'video' ? 'fa-video' : ($media->type === 'pdf' ? 'fa-file-pdf' : 'fa-file-alt') }}" style="font-size:32px;color:#9ca3af;"></i></div>
-          @endif
-          <span class="type-badge {{ $media->type }}">{{ strtoupper(substr($media->type, 0, 4)) }}</span>
-          <div class="media-zoom-btn" onclick="event.stopPropagation(); previewMedia('{{ asset('storage/' . $media->file_path) }}', '{{ $media->type }}')"><i class="fas fa-search-plus"></i></div>
-        </div>
-        <div class="media-info">
-          <div class="media-title">{{ $media->title }}</div>
-          <div class="media-meta"><span>{{ $media->type }}</span><span>{{ round(($media->size ?? 0) / 1024 / 1024, 1) }} MB</span></div>
-        </div>
+<div class="media-widget">
+  <div class="section-header"><h2 class="section-title">Médiathèque récente</h2><a href="{{ route('media.index') }}" class="section-link">Voir tout <i class="fas fa-arrow-right"></i></a></div>
+  <div class="media-grid" id="mediaGrid">
+    @forelse(($recentMedia ?? []) as $media)
+    <div class="media-card" data-media-id="{{ $media->id }}" data-media-type="{{ $media->type }}" data-media-url="{{ $media->type === 'webpage' ? ($media->url ?? '#') : asset('storage/' . $media->file_path) }}" data-media-title="{{ $media->title }}" data-search="{{ strtolower($media->title) }} {{ strtolower($media->type) }}">
+      <div class="media-thumb" style="{{ $media->type === 'image' ? 'background-image: url(' . asset('storage/' . $media->file_path) . '); background-size: cover;' : '' }}">
+        @if($media->type === 'webpage')
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#eff6ff;color:#3b82f6;font-size:32px;"><i class="fas fa-globe"></i></div>
+        @elseif($media->type !== 'image')
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f3f4f6;font-size:32px;color:#9ca3af;">
+            <i class="fas {{ $media->type === 'video' ? 'fa-video' : ($media->type === 'pdf' ? 'fa-file-pdf' : 'fa-file-alt') }}"></i>
+          </div>
+        @endif
+        <span class="type-badge {{ $media->type }}">{{ $media->type === 'webpage' ? 'WEB' : strtoupper(substr($media->type, 0, 4)) }}</span>
+        <div class="media-zoom-btn" onclick="event.stopPropagation(); previewMedia('{{ $media->type === 'webpage' ? ($media->url ?? '#') : asset('storage/' . $media->file_path) }}', '{{ $media->type }}')"><i class="fas fa-search-plus"></i></div>
       </div>
-      @empty
-      <div class="media-card"><div class="media-info"><div class="media-title">Aucun média</div></div></div>
-      @endforelse
+      <div class="media-info">
+        <div class="media-title">{{ $media->title }}</div>
+        <div class="media-meta"><span>{{ $media->type === 'webpage' ? 'Lien' : $media->type }}</span><span>{{ $media->type === 'webpage' ? '0 MB' : round(($media->size ?? 0) / 1024 / 1024, 1) . ' MB' }}</span></div>
+      </div>
     </div>
+    @empty
+    <div class="media-card"><div class="media-info"><div class="media-title">Aucun média</div></div></div>
+    @endforelse
   </div>
+</div>
 
   <!-- Campagnes actives -->
   <div class="campaigns-widget">
@@ -96,26 +100,56 @@
 
   <!-- Assistant IA -->
   <div class="ai-assistant-widget">
-    <div class="ai-header"><h2 class="ai-title">Assistant IA - DigiCMS</h2><p class="ai-subtitle">Générez, optimisez et évaluez vos contenus marketing en quelques secondes</p></div>
-    <div class="ai-pills">
-      <button class="ai-pill" onclick="document.getElementById('aiPrompt').value='Génère un slogan percutant pour notre nouvelle campagne'"><i class="fas fa-magic"></i> Générer un slogan</button>
-      <button class="ai-pill" onclick="document.getElementById('aiPrompt').value='Propose 10 mots-clés stratégiques pour un affichage dynamique'"><i class="fas fa-key"></i> Proposer des mots-clés</button>
-      <button class="ai-pill" onclick="document.getElementById('aiPrompt').value='Évalue la qualité de ce message marketing'"><i class="fas fa-star"></i> Évaluer mon message</button>
-      <button class="ai-pill" onclick="document.getElementById('aiPrompt').value='Donne-moi une idée créative de visuel pour'"><i class="fas fa-lightbulb"></i> Idée de visuel</button>
-      <button class="ai-pill" onclick="document.getElementById('aiPrompt').value='Rédige une description attrayante pour'"><i class="fas fa-pen-fancy"></i> Description d'affichage</button>
-    </div>
-    <div class="ai-input-wrapper">
-      <input type="text" id="aiPrompt" placeholder="Ex: Génère un slogan pour une promo été sur écran extérieur...">
-      <button class="ai-generate-btn" onclick="showToast('Demande envoyée à l\'IA', 'success')">Générer <i class="fas fa-paper-plane"></i></button>
+      <div class="ai-header"><h2 class="ai-title">Assistant IA - DigiCMS</h2><p class="ai-subtitle">Générez, optimisez et évaluez vos contenus marketing en quelques secondes</p></div>
+      <div class="ai-pills">
+          <button class="ai-pill" onclick="setAIPrompt('Génère un slogan percutant pour notre nouvelle campagne')"><i class="fas fa-magic"></i> Générer un slogan</button>
+          <button class="ai-pill" onclick="setAIPrompt('Propose 10 mots-clés stratégiques pour un affichage dynamique')"><i class="fas fa-key"></i> Proposer des mots-clés</button>
+          <button class="ai-pill" onclick="setAIPrompt('Évalue la qualité de ce message marketing')"><i class="fas fa-star"></i> Évaluer mon message</button>
+          <button class="ai-pill" onclick="setAIPrompt('Donne-moi une idée créative de visuel pour')"><i class="fas fa-lightbulb"></i> Idée de visuel</button>
+          <button class="ai-pill" onclick="setAIPrompt('Rédige une description attrayante pour')"><i class="fas fa-pen-fancy"></i> Description d'affichage</button>
+      </div>
+      <div class="ai-input-wrapper">
+          <input type="text" id="aiPrompt" placeholder="Ex: Génère un slogan pour une promo été sur écran extérieur...">
+          <button class="ai-generate-btn" onclick="sendToAI()">Générer <i class="fas fa-paper-plane"></i></button>
+      </div>
+  </div>
+
+
+  <!-- Modal Preview -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <div id="previewContent"></div>
+      <button class="modal-close" onclick="closePreviewModal()">Fermer</button>
     </div>
   </div>
 </main>
 
-<!-- Modal Preview -->
-<div id="previewModal" class="modal">
-  <div class="modal-content">
-    <div id="previewContent"></div>
-    <button class="modal-close" onclick="closePreviewModal()">Fermer</button>
-  </div>
-</div>
+@push('scripts')
+<script src="{{ asset('js/dashboard.js') }}"></script>
+<script>
+    // دوال إضافية خاصة بـ Dashboard
+    function setAIPrompt(text) {
+        const input = document.getElementById('aiPrompt');
+        if (input) {
+            input.value = text;
+        }
+    }
+
+    function sendToAI() {
+        const input = document.getElementById('aiPrompt');
+        const query = input.value.trim();
+        
+        if (query === '') {
+            showToast('Veuillez entrer une requête', 'error');
+            return;
+        }
+        
+        showToast('Demande envoyée à l\'IA', 'success');
+        
+        setTimeout(function() {
+            window.location.href = '/ai-assistant?query=' + encodeURIComponent(query);
+        }, 500);
+    }
+</script>
+@endpush
 @endsection

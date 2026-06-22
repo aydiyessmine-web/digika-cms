@@ -7,35 +7,49 @@ use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\SettingsHelper;
 
 class CampaignController extends Controller
 {
     public function index()
     {
-        // جلب كل الحملات (للبحث والتصفية في JavaScript)
-        $allCampaigns = Campaign::with('media')->orderBy('created_at', 'desc')->get();
+        $campaigns = Campaign::with('media')->get();
+        $allMedia = Media::all();
+        
+        $campaignsData = $campaigns->map(function($campaign) {
+            return [
+                'id' => $campaign->id,
+                'title' => $campaign->title,
+                'description' => $campaign->description,
+                'status' => $campaign->status,
+                'start_date' => $campaign->start_date,
+                'end_date' => $campaign->end_date,
+                'progress' => $campaign->progress,
+                'background_image' => $campaign->background_image ? asset('storage/' . $campaign->background_image) : null,
+                'media_count' => $campaign->media->count(),
+                'media_ids' => $campaign->media->pluck('id')->toArray(),
+                'media' => $campaign->media,
+                'created_at' => $campaign->created_at,
+                'updated_at' => $campaign->updated_at
+            ];
+        });
         
         $totalCampaigns = Campaign::count();
         $activeCampaigns = Campaign::where('status', 'active')->count();
         $plannedCampaigns = Campaign::where('status', 'planned')->count();
         $finishedCampaigns = Campaign::where('status', 'finished')->count();
         
-        $allMedia = Media::all();
-        
-        // تحضير بيانات الحملات مع media_ids
-        $campaignsData = [];
-        foreach ($allCampaigns as $campaign) {
-            $campaignData = $campaign->toArray();
-            $campaignData['media_ids'] = $campaign->media->pluck('id')->toArray();
-            $campaignData['media_count'] = $campaign->media->count();
-            $campaignsData[] = $campaignData;
-        }
+        // Campaigns per page depuis les paramètres
+        $campaignsPerPage = SettingsHelper::getCampaignsPerPage();
         
         return view('campaigns.index', compact(
-            'campaignsData', 'totalCampaigns', 'activeCampaigns', 
-            'plannedCampaigns', 'finishedCampaigns', 'allMedia'
+            'campaignsData', 'allMedia', 'totalCampaigns', 'activeCampaigns',
+            'plannedCampaigns', 'finishedCampaigns', 'campaignsPerPage'
         ));
     }
+    
+    // ... autres méthodes
+
 
     public function store(Request $request)
     {

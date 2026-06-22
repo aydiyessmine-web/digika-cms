@@ -11,7 +11,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'is_active', 'last_login_at', 'last_login_ip',
+        'name', 'email', 'password', 'role', 'is_active', 
+        'last_login_at', 'last_login_ip', 'blocked_until'
     ];
 
     protected $hidden = [
@@ -22,9 +23,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'is_active' => 'boolean',
         'last_login_at' => 'datetime',
+        'blocked_until' => 'datetime',
     ];
 
-    // Helper methods pour les rôles
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -35,12 +36,45 @@ class User extends Authenticatable
         return $this->role === 'marketing';
     }
 
-    public function isViewer(): bool
+    // Vérifier si le compte est bloqué temporairement
+    public function isBlocked(): bool
     {
-        return $this->role === 'viewer';
+        if (!$this->blocked_until) return false;
+        return $this->blocked_until->isFuture();
     }
 
-    // Relations
+    // Ajouter cette méthode dans le modèle User
+    public function getBlockedTimeRemaining(): ?string
+    {
+        if (!$this->blocked_until || !$this->blocked_until->isFuture()) {
+            return null;
+        }
+        
+        $minutes = $this->blocked_until->diffInMinutes(now());
+        $seconds = $this->blocked_until->diffInSeconds(now()) % 60;
+        
+        if ($minutes > 0) {
+            return $minutes . ' min ' . $seconds . ' s';
+        }
+        return $seconds . ' secondes';
+    }
+
+    // Débloquer le compte
+    public function unblock()
+    {
+        $this->blocked_until = null;
+        $this->is_active = true;
+        $this->save();
+    }
+
+    // Bloquer le compte pour une durée donnée (en minutes)
+    public function block($minutes = 15)
+    {
+        $this->blocked_until = now()->addMinutes($minutes);
+        $this->is_active = false;
+        $this->save();
+    }
+
     public function campaigns()
     {
         return $this->hasMany(Campaign::class);

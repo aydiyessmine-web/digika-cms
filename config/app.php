@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Africa/Tunis', // ou 'Africa/Tunis',
 
     /*
     |--------------------------------------------------------------------------
@@ -103,6 +103,11 @@ return [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
         ),
+    ],
+
+    'aliases' => [
+        // ...
+        'Settings' => App\Helpers\SettingsHelper::class,
     ],
 
     /*

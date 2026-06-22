@@ -157,7 +157,7 @@
   const allMediaData = @json($mediaData ?? []);
   let allMedia = [...allMediaData];
   let currentPage = 1;
-  let itemsPerPage = 10;
+  let itemsPerPage = {{ $mediaPerPage ?? 10 }};
   let currentType = 'all';
   let currentSort = 'recent';
   let currentMediaSearch = '';

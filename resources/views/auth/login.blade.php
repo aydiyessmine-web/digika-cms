@@ -435,17 +435,18 @@
             </div>
           </div>
           <!-- Role Field -->
+          <!-- Role Field -->
           <div class="form-group">
-            <label for="role">Rôle</label>
-            <div class="select-wrapper">
-              <span class="select-arrow-left">▼</span>
-              <select id="role" name="role" required>
-                <option value="">Sélectionnez votre rôle</option>
-                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrateur</option>
-                <option value="marketing" {{ old('role') == 'marketing' ? 'selected' : '' }}>Marketing</option>
-                <option value="viewer" {{ old('role') == 'viewer' ? 'selected' : '' }}>Visualisateur</option>
-              </select>
-            </div>
+              <label for="role">Rôle</label>
+              <div class="select-wrapper">
+                  <span class="select-arrow-left">▼</span>
+                  <select id="role" name="role" required>
+                      <option value="">Sélectionnez votre rôle</option>
+                      <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrateur</option>
+                      <option value="marketing" {{ old('role') == 'marketing' ? 'selected' : '' }}>Marketing</option>
+                      <!-- إزالة viewer -->
+                  </select>
+              </div>
           </div>
           <!-- Submit Button -->
           <button type="submit" class="submit-btn">Se connecter</button>

@@ -4,20 +4,23 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!Auth::check()) {
+        // التحقق من أن المستخدم مسجل الدخول
+        if (!auth()->check()) {
             return redirect('/login');
         }
 
-        $userRole = Auth::user()->role;
-
+        // جلب دور المستخدم
+        $userRole = auth()->user()->role;
+        
+        // التحقق من أن دور المستخدم موجود في الأدوار المسموح بها
         if (!in_array($userRole, $roles)) {
-            abort(403, 'Accès non autorisé. Vous n\'avez pas les permissions nécessaires.');
+            // إذا كان دور المستخدم غير مسموح، نعرض صفحة 403 مع رسالة واضحة
+            abort(403, 'Accès non autorisé. Rôle requis: ' . implode(' ou ', $roles) . '. Votre rôle actuel: ' . $userRole);
         }
 
         return $next($request);

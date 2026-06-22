@@ -8,54 +8,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\SettingsHelper;
 
 class MediaController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Media::with('category');
-        
-        if ($request->filled('category') && $request->category != 'all') {
-            $query->whereHas('category', function($q) use ($request) {
-                $q->where('name', $request->category);
-            });
-        }
-        
-        if ($request->filled('type') && $request->type != 'all') {
-            $query->where('type', $request->type);
-        }
-        
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-        
-        $sort = $request->get('sort', 'recent');
-        if ($sort == 'recent') {
-            $query->orderBy('created_at', 'desc');
-        } elseif ($sort == 'oldest') {
-            $query->orderBy('created_at', 'asc');
-        } elseif ($sort == 'name') {
-            $query->orderBy('title', 'asc');
-        }
-        
-        $allMedia = $query->get();
-        
-        $mediaData = [];
-        foreach ($allMedia as $item) {
-            $mediaData[] = [
+        $media = Media::with('category')->get();
+        $mediaData = $media->map(function($item) {
+            return [
                 'id' => $item->id,
                 'title' => $item->title,
                 'type' => $item->type,
                 'file_path' => $item->file_path,
                 'url' => $item->url,
                 'size' => $item->size,
-                'resolution' => $item->resolution,
-                'duration' => $item->duration,
                 'category_id' => $item->category_id,
-                'category' => $item->category ? ['name' => $item->category->name] : null,
+                'category' => $item->category ? [
+                    'id' => $item->category->id,
+                    'name' => $item->category->name
+                ] : null,
                 'created_at' => $item->created_at,
+                'updated_at' => $item->updated_at
             ];
-        }
+        });
         
         $categories = Category::all();
         
@@ -65,11 +41,15 @@ class MediaController extends Controller
         $pdfCount = Media::where('type', 'pdf')->count();
         $documentsCount = Media::where('type', 'document')->count();
         $webpagesCount = Media::where('type', 'webpage')->count();
-        $totalSize = round(Media::sum('size') / 1024 / 1024, 1);
+        $totalSize = Media::sum('size');
+        $totalSizeMB = round($totalSize / 1024 / 1024, 1);
+        
+        // Media per page depuis les paramètres
+        $mediaPerPage = SettingsHelper::getMediaPerPage();
         
         return view('media.index', compact(
-            'mediaData', 'categories', 'totalMedia', 'imagesCount', 
-            'videosCount', 'pdfCount', 'documentsCount', 'webpagesCount', 'totalSize'
+            'mediaData', 'categories', 'totalMedia', 'imagesCount', 'videosCount',
+            'pdfCount', 'documentsCount', 'webpagesCount', 'totalSizeMB', 'mediaPerPage'
         ));
     }
     

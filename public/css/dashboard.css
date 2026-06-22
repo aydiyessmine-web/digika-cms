@@ -147,14 +147,80 @@ body, html { height: 100vh; width: 100vw; overflow: hidden; font-family: 'Poppin
 .ai-generate-btn:hover { background-color: #a81414; transform: translateY(-1px); }
 
 /* ========================================
-   MODAL PREVIEW
+   MODAL PREVIEW - AMÉLIORÉ
 ======================================== */
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 2000; }
-.modal-content { background: white; border-radius: 24px; padding: 24px; max-width: 90%; max-height: 90%; overflow: auto; text-align: center; animation: modalFadeIn 0.2s ease; }
-@keyframes modalFadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-.modal-content img, .modal-content video { max-width: 100%; max-height: 70vh; border-radius: 12px; }
-.modal-content .modal-close { margin-top: 20px; padding: 8px 24px; background: #c91818; color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; }
-.modal-content .modal-close:hover { background: #a81414; }
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    max-width: 95%;
+    max-height: 90vh;
+    overflow: auto;
+    text-align: center;
+    animation: modalFadeIn 0.3s ease;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+#previewContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+}
+
+#previewContent img,
+#previewContent video {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal-close {
+    margin-top: 20px;
+    padding: 10px 32px;
+    background: #c91818;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: #a81414;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(201, 24, 24, 0.3);
+}
 
 /* ========================================
    TOAST & UTILITIES
@@ -170,3 +236,12 @@ body, html { height: 100vh; width: 100vw; overflow: hidden; font-family: 'Poppin
 ======================================== */
 @media (max-width: 1200px) { .media-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 800px) { .main-content { padding: 20px; } .sidebar { width: 80px; } .sidebar .logo img { height: 40px; } .nav-item span { display: none; } .media-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Webpage badge */
+.type-badge.webpage {
+  background: rgba(20, 184, 166, 0.9) !important;
+}
+.type-badge.webpage::before {
+  content: "🌐";
+  margin-right: 3px;
+}

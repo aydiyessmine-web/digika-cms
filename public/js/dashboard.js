@@ -9,11 +9,22 @@ function showToast(message, type = 'success') {
 function previewMedia(url, type) {
   const previewDiv = document.getElementById('previewContent');
   if (type === 'image') {
-    previewDiv.innerHTML = `<img src="${url}" alt="Aperçu">`;
+    previewDiv.innerHTML = `<img src="${url}" alt="Aperçu" style="max-width:100%; max-height:70vh; border-radius:8px;">`;
   } else if (type === 'video') {
     previewDiv.innerHTML = `<video controls src="${url}" style="max-width:100%; max-height:70vh;"></video>`;
   } else if (type === 'pdf') {
     previewDiv.innerHTML = `<div style="padding:40px;text-align:center;"><i class="fas fa-file-pdf" style="font-size:80px;color:#ef4444;"></i><p style="margin-top:16px;">Fichier PDF</p><a href="${url}" target="_blank" style="display:inline-block;margin-top:16px;padding:8px 20px;background:#c91818;color:white;border-radius:30px;text-decoration:none;"><i class="fas fa-external-link-alt"></i> Ouvrir le PDF</a></div>`;
+  } else if (type === 'webpage') {
+    previewDiv.innerHTML = `<div style="padding:20px;text-align:center;background:#f8fafc;border-radius:12px;">
+      <i class="fas fa-globe" style="font-size:80px;color:#3b82f6;"></i>
+      <p style="margin:16px 0;font-weight:600;">Page Web</p>
+      <div style="margin-bottom:16px;padding:12px;background:#ffffff;border-radius:8px;border:1px solid #e2e8f0;word-break:break-all;">
+        <strong>URL:</strong> <a href="${url}" target="_blank" style="color:#3b82f6;">${url}</a>
+      </div>
+      <a href="${url}" target="_blank" style="display:inline-block;padding:10px 24px;background:#c91818;color:white;border-radius:30px;text-decoration:none;">
+        <i class="fas fa-external-link-alt"></i> Ouvrir la page
+      </a>
+    </div>`;
   } else {
     previewDiv.innerHTML = `<div style="padding:40px;text-align:center;"><i class="fas fa-file-alt" style="font-size:80px;color:#64748b;"></i><p style="margin-top:16px;">Document</p><a href="${url}" download style="display:inline-block;margin-top:16px;padding:8px 20px;background:#c91818;color:white;border-radius:30px;text-decoration:none;"><i class="fas fa-download"></i> Télécharger</a></div>`;
   }
@@ -113,12 +124,15 @@ document.querySelectorAll('[data-theme]').forEach(opt => {
   });
 });
 
-// AI pills
+// AI pills - تعبئة الـ input عند الضغط على الأزرار
 document.querySelectorAll('.ai-pill').forEach(pill => {
   pill.addEventListener('click', () => { 
-    const text = pill.textContent.replace(/[✦⭐]/g, '').trim();
     const input = document.getElementById('aiPrompt');
-    if (input) input.value = text; 
+    if (input) {
+      // استخراج النص من الزر (بدون الأيقونات)
+      const text = pill.textContent.trim();
+      input.value = text;
+    }
   });
 });
 
@@ -126,3 +140,33 @@ document.querySelectorAll('.ai-pill').forEach(pill => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closePreviewModal();
 });
+
+// ============================================================
+// دوال Assistant IA الخاصة بـ Dashboard
+// ============================================================
+
+// دالة لتعبئة الـ input من Dashboard
+function setAIPrompt(text) {
+    const input = document.getElementById('aiPrompt');
+    if (input) {
+        input.value = text;
+    }
+}
+
+// دالة الإرسال إلى AI من Dashboard
+function sendToAI() {
+    const input = document.getElementById('aiPrompt');
+    const query = input.value.trim();
+    
+    if (query === '') {
+        showToast('Veuillez entrer une requête', 'error');
+        return;
+    }
+    
+    showToast('Demande envoyée à l\'IA', 'success');
+    
+    // التوجيه إلى صفحة الـ AI Assistant مع الـ query
+    setTimeout(function() {
+        window.location.href = '/ai-assistant?query=' + encodeURIComponent(query);
+    }, 500);
+}

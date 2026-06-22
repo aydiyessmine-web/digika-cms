@@ -10,19 +10,19 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Données pour les statistiques
+        // Dashboard fixe - toujours 10 médias récents
         $totalMedia = Media::count();
         $imagesCount = Media::where('type', 'image')->count();
         $videosCount = Media::where('type', 'video')->count();
         $pdfCount = Media::where('type', 'pdf')->count();
-        $documentsCount = Media::whereIn('type', ['document', 'doc', 'docx', 'txt'])->count();
+        $documentsCount = Media::where('type', 'document')->count();
+        $webpagesCount = Media::where('type', 'webpage')->count();
         $totalSize = Media::sum('size');
         $totalSizeMB = round($totalSize / 1024 / 1024, 1);
         
-        // Derniers médias (pour le widget)
+        // Dashboard: toujours 10 médias récents
         $recentMedia = Media::orderBy('created_at', 'desc')->limit(10)->get();
         
-        // Campagnes actives (pour le widget)
         $activeCampaignsList = Campaign::with('media')
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
@@ -32,7 +32,6 @@ class DashboardController extends Controller
         $activeCampaigns = $activeCampaignsList->count();
         $totalCampaigns = Campaign::count();
         
-        // Données simulées pour les tendances (à remplacer par de vraies données)
         $newMediaThisMonth = Media::whereMonth('created_at', now()->month)->count();
         $mediaGrowth = 8.4;
         $newCampaignsThisWeek = Campaign::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
@@ -40,9 +39,10 @@ class DashboardController extends Controller
         $iaGrowth = rand(-10, 15);
         
         return view('dashboard.index', compact(
-            'totalMedia', 'imagesCount', 'videosCount', 'pdfCount', 'documentsCount', 'totalSizeMB',
-            'recentMedia', 'activeCampaignsList', 'activeCampaigns', 'totalCampaigns',
-            'newMediaThisMonth', 'mediaGrowth', 'newCampaignsThisWeek', 'iaRequestsToday', 'iaGrowth'
+            'totalMedia', 'imagesCount', 'videosCount', 'pdfCount', 'documentsCount', 
+            'webpagesCount', 'totalSizeMB', 'recentMedia', 'activeCampaignsList', 
+            'activeCampaigns', 'totalCampaigns', 'newMediaThisMonth', 'mediaGrowth', 
+            'newCampaignsThisWeek', 'iaRequestsToday', 'iaGrowth'
         ));
     }
 }

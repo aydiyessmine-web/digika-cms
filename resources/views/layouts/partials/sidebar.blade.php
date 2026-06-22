@@ -19,7 +19,7 @@
         <span>Campagnes</span>
       </a>
       <div class="nav-section-title">INTELLIGENCE IA</div>
-      <a href="{{ route('ai.assistant') }}" class="nav-item {{ request()->routeIs('ai.assistant') ? 'active' : '' }}">
+      <a href="{{ route('ai.assistant') }}" class="nav-item {{ request()->routeIs('ai.assistant') || request()->routeIs('ai.*') ? 'active' : '' }}">
   <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"></circle><path d="M12 2a8 8 0 0 0-8 8c0 4 3 6 8 10 5-4 8-6 8-10a8 8 0 0 0-8-8z"></path></svg>
   <span>Assistant IA</span>
 </a>

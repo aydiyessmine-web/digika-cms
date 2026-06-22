@@ -6,20 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('group');
-            $table->string('key');
+            $table->string('group')->default('general'); // ai, security, display, notifications
+            $table->string('key')->unique();
             $table->text('value')->nullable();
-            $table->string('type')->default('string');
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->unique(['group', 'key']);
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('settings');
     }
