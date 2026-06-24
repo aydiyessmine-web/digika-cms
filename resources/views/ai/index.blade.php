@@ -5,149 +5,9 @@
 @push('styles')
 
 <link href="{{ asset('css/ai.css') }}" rel="stylesheet">
+<link href="{{ asset('css/assistant.css') }}" rel="stylesheet">
 
-<style>
-  .chat-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .chat-actions .clear-btn {
-    background: #f3f4f6;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 30px;
-    font-size: 11px;
-    font-weight: 500;
-    color: #4b5563;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .chat-actions .clear-btn:hover {
-    background: #e5e7eb;
-    color: #c91818;
-  }
 
-  /* Style pour la recherche */
-  .search-wrapper {
-    position: relative;
-    width: 260px;
-  }
-  .search-wrapper .search-input {
-    width: 100%;
-    height: 36px;
-    padding: 0 38px 0 14px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 20px;
-    font-size: 12px;
-    outline: none;
-    transition: all 0.2s;
-  }
-  .search-wrapper .search-input:focus {
-    border-color: #c91818;
-    box-shadow: 0 0 0 3px rgba(201,24,24,0.1);
-  }
-  .search-wrapper .search-icon {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-    pointer-events: none;
-    font-size: 14px;
-  }
-  .search-wrapper .search-clear {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #9ca3af;
-    cursor: pointer;
-    font-size: 14px;
-    display: none;
-    z-index: 2;
-  }
-  .search-wrapper .search-clear:hover {
-    color: #c91818;
-  }
-  .search-wrapper .search-clear.visible {
-    display: block;
-  }
-
-  /* Highlight pour la recherche */
-  .message-highlight {
-    background-color: #fef2f2 !important;
-    border-left: 3px solid #c91818 !important;
-    padding-left: 13px !important;
-    transition: all 0.3s ease;
-    border-radius: 8px !important;
-  }
-  .history-item.highlight {
-    background-color: #fef2f2 !important;
-    border-radius: 10px !important;
-    padding: 10px 8px !important;
-    margin: 0 -8px !important;
-  }
-  .message-highlight .text {
-    background-color: #fef2f2 !important;
-  }
-
-  /* Historique header */
-  .history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .history-header button {
-    background: none;
-    border: none;
-    color: #c91818;
-    font-size: 11px;
-    cursor: pointer;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .history-header button:hover {
-    text-decoration: underline;
-  }
-
-  
-
-  /* Tooltip pour les titres */
-  .history-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px;
-  }
-
-  /* ========================================
-     SUPPRESSION DES STATISTIQUES
-     AGRANDISSEMENT DE L'HISTORIQUE
-  ======================================== */
-  .ai-history-panel {
-    flex: 1 !important;
-    max-width: 335px !important;
-    min-height: 300px !important;
-  }
-
-  .history-list {
-    max-height: 460px !important;
-    overflow-y: auto !important;
-  }
-
-  /* Suppression de la section statistiques */
-  .stats-section {
-    display: none !important;
-  }
-</style>
 @endpush
 
 @section('content')
@@ -417,9 +277,8 @@
     }
   }
 
-  // ============================================================
-  // تحميل التاريخ من قاعدة البيانات
-  // ============================================================
+  
+
   async function loadChatHistoryFromDB() {
     try {
       const response = await fetch('/ai/history');
@@ -447,9 +306,7 @@
     }
   }
 
-  // ============================================================
-  // تحميل محادثة معينة
-  // ============================================================
+  
   function loadConversation(sessionId) {
     fetch('/ai/history')
       .then(res => res.json())
@@ -467,9 +324,7 @@
       .catch(err => console.error('Erreur chargement conversation:', err));
   }
 
-  // ============================================================
-  // تحديث قائمة التاريخ في الجانب الأيمن
-  // ============================================================
+  
   function updateHistoryList(data) {
     const historyList = document.getElementById('historyList');
     
@@ -506,9 +361,7 @@
     }
   }
 
-  // ============================================================
-  // Effacer historique من قاعدة البيانات
-  // ============================================================
+ 
   async function clearHistoryFromDB() {
     if (!confirm('Voulez-vous effacer tout l\'historique de la conversation ?')) return;
     
@@ -534,9 +387,7 @@
     }
   }
 
-  // ============================================================
-  // إرسال طلب
-  // ============================================================
+ 
   async function sendRequest(prompt, toolType = null) {
     if (!prompt.trim()) {
         showToast('Veuillez écrire une demande', 'warning');
@@ -582,9 +433,7 @@
     currentSessionId = null;
   }
 
-  // ============================================================
-  // Copier tout l'historique
-  // ============================================================
+
   function copyAllChat() {
     const messages = document.querySelectorAll('.message .text');
     let text = '';
@@ -604,9 +453,7 @@
     });
   }
 
-  // ============================================================
-  // Exporter l'historique en fichier texte
-  // ============================================================
+  
   function exportChat() {
     const messages = document.querySelectorAll('.message');
     let text = '--- Assistant IA DigiCMS ---\n\n';
@@ -626,9 +473,7 @@
     showToast('Export terminé !', 'success');
   }
 
-  // ============================================================
-  // دالة setAIPrompt - لتعبئة الـ input من Dashboard
-  // ============================================================
+  
   function setAIPrompt(text) {
     const input = document.getElementById('aiPrompt');
     if (input) {
@@ -636,9 +481,7 @@
     }
   }
 
-  // ============================================================
-  // دالة sendToAI - للإرسال من Dashboard
-  // ============================================================
+  
   function sendToAI() {
     const input = document.getElementById('aiPrompt');
     const query = input.value.trim();
@@ -655,9 +498,7 @@
     }, 500);
   }
 
-  // ============================================================
-  // استقبال الـ query من الرابط (من Dashboard)
-  // ============================================================
+ 
   function handleQueryFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get('query');
