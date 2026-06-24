@@ -3,7 +3,9 @@
 @section('title', 'Assistant IA - DigiCMS')
 
 @push('styles')
+
 <link href="{{ asset('css/ai.css') }}" rel="stylesheet">
+
 <style>
   .chat-actions {
     display: flex;
@@ -95,18 +97,6 @@
     background-color: #fef2f2 !important;
   }
 
-  /* Stats avec icônes */
-  .stat-item .stat-value {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 20px;
-  }
-  .stat-item .stat-value i {
-    font-size: 16px;
-  }
-
   /* Historique header */
   .history-header {
     display: flex;
@@ -128,11 +118,7 @@
     text-decoration: underline;
   }
 
-  /* Aucun mot-clé */
-  .keywords-cloud .no-keywords {
-    color: #9ca3af;
-    font-size: 12px;
-  }
+  
 
   /* Tooltip pour les titres */
   .history-title {
@@ -140,6 +126,26 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 160px;
+  }
+
+  /* ========================================
+     SUPPRESSION DES STATISTIQUES
+     AGRANDISSEMENT DE L'HISTORIQUE
+  ======================================== */
+  .ai-history-panel {
+    flex: 1 !important;
+    max-width: 335px !important;
+    min-height: 300px !important;
+  }
+
+  .history-list {
+    max-height: 460px !important;
+    overflow-y: auto !important;
+  }
+
+  /* Suppression de la section statistiques */
+  .stats-section {
+    display: none !important;
   }
 </style>
 @endpush
@@ -259,7 +265,7 @@
       </div>
     </div>
 
-    <!-- RIGHT PANEL : Historique & Stats -->
+    <!-- RIGHT PANEL : Historique (Agrandi) -->
     <div class="ai-history-panel">
       <div class="history-header">
         <h3><i class="fas fa-clock-rotate-left"></i> Historique récent</h3>
@@ -270,49 +276,6 @@
           <i class="fas fa-spinner fa-spin"></i> Chargement...
         </div>
       </div>
-      
-      <div class="stats-section">
-        <h3><i class="fas fa-chart-line"></i> Statistiques IA</h3>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value" id="statTotalRequests">
-              <i class="fas fa-message" style="color:#3b82f6;"></i>
-              {{ $stats['total_requests'] ?? 0 }}
-            </span>
-            <span class="stat-label">Requêtes aujourd'hui</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value" id="statSlogans">
-              <i class="fas fa-bullhorn" style="color:#c91818;"></i>
-              {{ $stats['slogans'] ?? 0 }}
-            </span>
-            <span class="stat-label">Slogans générés</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value" id="statEvaluations">
-              <i class="fas fa-star" style="color:#f59e0b;"></i>
-              {{ $stats['evaluations'] ?? 0 }}
-            </span>
-            <span class="stat-label">Évaluations faites</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value" id="statKeywords">
-              <i class="fas fa-tags" style="color:#10b981;"></i>
-              {{ $stats['keywords'] ?? 0 }}
-            </span>
-            <span class="stat-label">Mots-clés proposés</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">
-              <i class="fas fa-chart-simple" style="color:#8b5cf6;"></i>
-              {{ $stats['avg_score'] ?? 7.4 }}
-            </span>
-            <span class="stat-label">Score moyen /10</span>
-          </div>
-        </div>
-      </div>
-      
-      
     </div>
   </div>
 </main>
@@ -358,7 +321,6 @@
       chatHistory.push({ role: 'assistant', content: text });
     }
     
-    // Appliquer la recherche si active
     if (searchTerm) {
       applySearchHighlight(searchTerm);
     }
@@ -393,7 +355,6 @@
     const messages = document.querySelectorAll('.message');
     const historyItems = document.querySelectorAll('.history-item');
     
-    // Messages
     messages.forEach(msg => {
       const text = msg.querySelector('.text')?.innerText?.toLowerCase() || '';
       if (searchTerm && text.includes(searchTerm)) {
@@ -403,7 +364,6 @@
       }
     });
     
-    // Historique
     historyItems.forEach(item => {
       const title = item.querySelector('.history-title')?.innerText?.toLowerCase() || '';
       if (searchTerm && title.includes(searchTerm)) {
@@ -413,7 +373,6 @@
       }
     });
     
-    // Afficher/masquer le bouton clear
     const clearBtn = document.getElementById('searchClear');
     if (clearBtn) {
       if (searchTerm) {
@@ -445,9 +404,6 @@
       const data = await response.json();
       
       if (data.success) {
-        if (data.stats) {
-          updateStatsUI(data.stats);
-        }
         if (data.session_id) {
           currentSessionId = data.session_id;
         }
@@ -459,18 +415,6 @@
       console.error('Erreur:', error);
       return "⚠️ Erreur de connexion au serveur.";
     }
-  }
-
-  function updateStatsUI(stats) {
-    const statTotal = document.getElementById('statTotalRequests');
-    const statSlogans = document.getElementById('statSlogans');
-    const statEvaluations = document.getElementById('statEvaluations');
-    const statKeywords = document.getElementById('statKeywords');
-    
-    if (statTotal) statTotal.innerHTML = `<i class="fas fa-message" style="color:#3b82f6;"></i> ${stats.total_requests || 0}`;
-    if (statSlogans) statSlogans.innerHTML = `<i class="fas fa-bullhorn" style="color:#c91818;"></i> ${stats.slogans || 0}`;
-    if (statEvaluations) statEvaluations.innerHTML = `<i class="fas fa-star" style="color:#f59e0b;"></i> ${stats.evaluations || 0}`;
-    if (statKeywords) statKeywords.innerHTML = `<i class="fas fa-tags" style="color:#10b981;"></i> ${stats.keywords || 0}`;
   }
 
   // ============================================================
@@ -557,7 +501,6 @@
       });
     });
     
-    // Appliquer la recherche si active
     if (searchTerm) {
       applySearchHighlight(searchTerm);
     }
@@ -686,20 +629,17 @@
   // ============================================================
   // دالة setAIPrompt - لتعبئة الـ input من Dashboard
   // ============================================================
-  // ============================================================
-// دالة setAIPrompt - لتعبئة الـ input من Dashboard
-// ============================================================
-function setAIPrompt(text) {
+  function setAIPrompt(text) {
     const input = document.getElementById('aiPrompt');
     if (input) {
         input.value = text;
     }
-}
+  }
 
-// ============================================================
-// دالة sendToAI - للإرسال من Dashboard
-// ============================================================
-function sendToAI() {
+  // ============================================================
+  // دالة sendToAI - للإرسال من Dashboard
+  // ============================================================
+  function sendToAI() {
     const input = document.getElementById('aiPrompt');
     const query = input.value.trim();
     
@@ -713,12 +653,12 @@ function sendToAI() {
     setTimeout(function() {
         window.location.href = '/ai-assistant?query=' + encodeURIComponent(query);
     }, 500);
-}
+  }
 
-// ============================================================
-// استقبال الـ query من الرابط (من Dashboard)
-// ============================================================
-function handleQueryFromURL() {
+  // ============================================================
+  // استقبال الـ query من الرابط (من Dashboard)
+  // ============================================================
+  function handleQueryFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get('query');
     if (query) {
@@ -733,7 +673,7 @@ function handleQueryFromURL() {
             }
         }, 800);
     }
-}
+  }
 
   // ============================================================
   // Initialisation
@@ -741,7 +681,6 @@ function handleQueryFromURL() {
   document.addEventListener('DOMContentLoaded', function() {
     loadChatHistoryFromDB();
     
-    // معالجة الـ query من الرابط
     handleQueryFromURL();
     
     // ============================================================
@@ -880,7 +819,7 @@ function handleQueryFromURL() {
         if (theme === 'dark') {
           mainDiv.style.backgroundColor = '#1e293b';
           mainDiv.style.color = '#e2e8f0';
-          document.querySelectorAll('.ai-tools-panel, .ai-chat-panel, .ai-history-panel, .tool-card, .chat-messages, .history-item, .stat-item, .keyword-tag').forEach(function(el) {
+          document.querySelectorAll('.ai-tools-panel, .ai-chat-panel, .ai-history-panel, .tool-card, .chat-messages, .history-item, .keyword-tag').forEach(function(el) {
             if (el) {
               el.style.backgroundColor = '#2d3a4e';
               el.style.color = '#e2e8f0';
@@ -893,7 +832,7 @@ function handleQueryFromURL() {
         } else {
           mainDiv.style.backgroundColor = '#fff';
           mainDiv.style.color = '#000';
-          document.querySelectorAll('.ai-tools-panel, .ai-chat-panel, .ai-history-panel, .tool-card, .chat-messages, .history-item, .stat-item, .keyword-tag').forEach(function(el) {
+          document.querySelectorAll('.ai-tools-panel, .ai-chat-panel, .ai-history-panel, .tool-card, .chat-messages, .history-item, .keyword-tag').forEach(function(el) {
             if (el) {
               el.style.backgroundColor = 'white';
               el.style.color = '#000';

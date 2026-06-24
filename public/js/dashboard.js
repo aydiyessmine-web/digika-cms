@@ -124,7 +124,7 @@ document.querySelectorAll('[data-theme]').forEach(opt => {
   });
 });
 
-// AI pills - تعبئة الـ input عند الضغط على الأزرار
+// AI pills
 document.querySelectorAll('.ai-pill').forEach(pill => {
   pill.addEventListener('click', () => { 
     const input = document.getElementById('aiPrompt');
@@ -142,10 +142,10 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
-// دوال Assistant IA الخاصة بـ Dashboard
+//Assistant IA de Dashboard
 // ============================================================
 
-// دالة لتعبئة الـ input من Dashboard
+
 function setAIPrompt(text) {
     const input = document.getElementById('aiPrompt');
     if (input) {
@@ -153,7 +153,7 @@ function setAIPrompt(text) {
     }
 }
 
-// دالة الإرسال إلى AI من Dashboard
+
 function sendToAI() {
     const input = document.getElementById('aiPrompt');
     const query = input.value.trim();
@@ -165,7 +165,7 @@ function sendToAI() {
     
     showToast('Demande envoyée à l\'IA', 'success');
     
-    // التوجيه إلى صفحة الـ AI Assistant مع الـ query
+    
     setTimeout(function() {
         window.location.href = '/ai-assistant?query=' + encodeURIComponent(query);
     }, 500);

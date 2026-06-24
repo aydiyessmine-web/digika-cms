@@ -127,7 +127,7 @@
 @push('scripts')
 <script src="{{ asset('js/dashboard.js') }}"></script>
 <script>
-    // دوال إضافية خاصة بـ Dashboard
+    
     function setAIPrompt(text) {
         const input = document.getElementById('aiPrompt');
         if (input) {
