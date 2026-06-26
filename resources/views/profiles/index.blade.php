@@ -149,10 +149,7 @@
                                 </span>
                             </td>
                             <td>
-                                @php
-                                    $isActive = (int) $user->is_active;
-                                @endphp
-                                @if($isActive === 1)
+                                @if($user->is_active)
                                     <span class="status-badge active">
                                         <i class="fas fa-circle"></i>
                                         Actif

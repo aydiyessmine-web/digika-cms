@@ -104,4 +104,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserSession::class);
     }
+    protected $appends = ['status_label'];
+
+    public function getStatusLabelAttribute()
+    {
+        return $this->is_active ? 'Actif' : 'Inactif';
+    }
+
+    public function getStatusClassAttribute()
+    {
+        return $this->is_active ? 'active' : 'inactive';
+    }
 }

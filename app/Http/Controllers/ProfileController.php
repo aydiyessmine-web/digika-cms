@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $totalUsers = $users->count();
         $activeUsers = $users->where('is_active', true)->count();
         $adminUsers = $users->where('role', 'admin')->count();
-        $pendingInvitations = 0; // Pour l'instant, on garde 0
+        $pendingInvitations = 0;
         
         return view('profiles.index', compact(
             'users', 'totalUsers', 'activeUsers', 'adminUsers', 'pendingInvitations'
@@ -112,7 +112,6 @@ class ProfileController extends Controller
     {
         $user = User::findOrFail($id);
         
-        // Empêcher la désactivation de son propre compte
         if ($user->id == Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -131,7 +130,6 @@ class ProfileController extends Controller
             'time' => now()
         ]);
 
-        // Si le compte est désactivé, terminer ses sessions
         if (!$user->is_active) {
             UserSession::where('user_id', $user->id)
                 ->where('is_current', true)
@@ -152,7 +150,6 @@ class ProfileController extends Controller
     {
         $user = User::findOrFail($id);
         
-        // Empêcher la suppression de son propre compte
         if ($user->id == Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -160,7 +157,6 @@ class ProfileController extends Controller
             ], 403);
         }
 
-        // Supprimer les sessions de l'utilisateur
         UserSession::where('user_id', $user->id)->delete();
         
         $email = $user->email;

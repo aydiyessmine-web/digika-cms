@@ -497,6 +497,9 @@
         border-radius: 20px !important;
         font-size: 11px !important;
         font-weight: 500 !important;
+        /* Supprime tout position: absolute ou float */
+        position: relative !important;
+        float: none !important;
     }
 
     .status-badge.active {
