@@ -13,45 +13,53 @@ use App\Helpers\SettingsHelper;
 class MediaController extends Controller
 {
     public function index()
-    {
-        $media = Media::with('category')->get();
-        $mediaData = $media->map(function($item) {
-            return [
-                'id' => $item->id,
-                'title' => $item->title,
-                'type' => $item->type,
-                'file_path' => $item->file_path,
-                'url' => $item->url,
-                'size' => $item->size,
-                'category_id' => $item->category_id,
-                'category' => $item->category ? [
-                    'id' => $item->category->id,
-                    'name' => $item->category->name
-                ] : null,
-                'created_at' => $item->created_at,
-                'updated_at' => $item->updated_at
-            ];
-        });
-        
-        $categories = Category::all();
-        
-        $totalMedia = Media::count();
-        $imagesCount = Media::where('type', 'image')->count();
-        $videosCount = Media::where('type', 'video')->count();
-        $pdfCount = Media::where('type', 'pdf')->count();
-        $documentsCount = Media::where('type', 'document')->count();
-        $webpagesCount = Media::where('type', 'webpage')->count();
-        $totalSize = Media::sum('size');
-        $totalSizeMB = round($totalSize / 1024 / 1024, 1);
-        
-        // Media per page depuis les paramètres
-        $mediaPerPage = SettingsHelper::getMediaPerPage();
-        
-        return view('media.index', compact(
-            'mediaData', 'categories', 'totalMedia', 'imagesCount', 'videosCount',
-            'pdfCount', 'documentsCount', 'webpagesCount', 'totalSizeMB', 'mediaPerPage'
-        ));
-    }
+{
+    $media = Media::with('category')->get();
+    $mediaData = $media->map(function($item) {
+        return [
+            'id' => $item->id,
+            'title' => $item->title,
+            'type' => $item->type,
+            'file_path' => $item->file_path,
+            'url' => $item->url,
+            'size' => $item->size,
+            'category_id' => $item->category_id,
+            'category' => $item->category ? [
+                'id' => $item->category->id,
+                'name' => $item->category->name
+            ] : null,
+            'created_at' => $item->created_at,
+            'updated_at' => $item->updated_at
+        ];
+    });
+    
+    $categories = Category::all();
+    
+    $totalMedia = Media::count();
+    $imagesCount = Media::where('type', 'image')->count();
+    $videosCount = Media::where('type', 'video')->count();
+    $pdfCount = Media::where('type', 'pdf')->count();
+    $documentsCount = Media::where('type', 'document')->count();
+    $webpagesCount = Media::where('type', 'webpage')->count();
+    
+    // ✅ Calcul plus robuste
+    $mediaWithSize = Media::where('type', '!=', 'webpage')->get();
+    $totalSize = $mediaWithSize->sum('size');
+    
+    // Convertir en MB avec 1 décimale
+    $totalSizeMB = $totalSize > 0 ? number_format($totalSize / 1048576, 1) : 0;
+    
+    // Debug (à supprimer après)
+    // \Log::info('Total size (bytes): ' . $totalSize);
+    // \Log::info('Total size (MB): ' . $totalSizeMB);
+    
+    $mediaPerPage = SettingsHelper::getMediaPerPage();
+    
+    return view('media.index', compact(
+        'mediaData', 'categories', 'totalMedia', 'imagesCount', 'videosCount',
+        'pdfCount', 'documentsCount', 'webpagesCount', 'totalSizeMB', 'mediaPerPage'
+    ));
+}
     
     public function store(Request $request)
     {

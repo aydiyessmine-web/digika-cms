@@ -47,7 +47,14 @@
     <div class="summary-card"><div class="summary-icon orange"><i class="fas fa-file-pdf"></i></div><div class="summary-info"><span class="summary-value">{{ $pdfCount ?? 0 }}</span><span class="summary-label">PDF</span></div></div>
     <div class="summary-card"><div class="summary-icon green"><i class="fas fa-file-alt"></i></div><div class="summary-info"><span class="summary-value">{{ $documentsCount ?? 0 }}</span><span class="summary-label">Documents</span></div></div>
     <div class="summary-card"><div class="summary-icon teal"><i class="fas fa-globe"></i></div><div class="summary-info"><span class="summary-value">{{ $webpagesCount ?? 0 }}</span><span class="summary-label">Pages Web</span></div></div>
-    <div class="summary-card"><div class="summary-icon slate"><i class="fas fa-database"></i></div><div class="summary-info"><span class="summary-value">{{ $totalSize ?? '0' }} MB</span><span class="summary-label">Stockage</span></div></div>
+    <!-- ✅ Correction -->
+<div class="summary-card">
+    <div class="summary-icon slate"><i class="fas fa-database"></i></div>
+    <div class="summary-info">
+        <span class="summary-value">{{ $totalSizeMB ?? '0' }} MB</span>
+        <span class="summary-label">Stockage</span>
+    </div>
+</div>
   </div>
 
   <!-- UPLOAD ZONE -->
